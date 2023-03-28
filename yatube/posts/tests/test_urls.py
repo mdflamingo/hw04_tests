@@ -23,8 +23,6 @@ class PostURLTests(TestCase):
         )
 
     def setUp(self):
-        self.guest_client = Client()
-        self.user = PostURLTests.user
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -32,17 +30,17 @@ class PostURLTests(TestCase):
         """Страницы доступны любому пользователю."""
         url_names = (
             reverse('posts:index'),
-            reverse('posts:group_list', kwargs={'slug': f'{self.group.slug}'}),
+            reverse('posts:group_list', kwargs={'slug': self.group.slug}),
             reverse('posts:post_detail', kwargs={'post_id': self.post.id})
         )
         for address in url_names:
             with self.subTest(address=address):
-                response = self.guest_client.get(address)
+                response = self.client.get(address)
                 self.assertEqual(response.status_code, 200)
 
     def test_url_unexisting_page(self):
         """Страница //unexisting_page/ не существует."""
-        response = self.guest_client.get('/unexisting_page/')
+        response = self.client.get('/unexisting_page/')
         self.assertEqual(response.status_code, 404)
 
     def test_post_list_url_exists_at_desired_location_authorized(self):
@@ -54,7 +52,7 @@ class PostURLTests(TestCase):
         """Страница по адресу /create/ перенаправит анонимного
         пользователя на страницу логина.
         """
-        response = self.guest_client.get(
+        response = self.client.get(
             reverse('posts:post_create'), follow=True)
         self.assertRedirects(
             response, '/auth/login/?next=/create/')

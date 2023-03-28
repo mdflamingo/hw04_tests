@@ -26,8 +26,6 @@ class PostCreateFormTests(TestCase):
         )
 
     def setUp(self):
-        self.guest_client = Client()
-        self.user = PostCreateFormTests.user
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -67,6 +65,7 @@ class PostCreateFormTests(TestCase):
         self.assertNotEqual(self.post.text, form_data['text'])
         self.assertTrue(
             Post.objects.filter(
+                id=self.post.id,
                 text=form_data['text'],
                 group=self.group.id,
                 author=PostCreateFormTests.user

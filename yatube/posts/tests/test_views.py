@@ -40,8 +40,6 @@ class ViewsURLTests(TestCase):
         )
 
     def setUp(self):
-        self.guest_client = Client()
-        self.user = ViewsURLTests.user
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -50,9 +48,9 @@ class ViewsURLTests(TestCase):
 
         templates_pages_names = {
             reverse('posts:index'): 'posts/index.html',
-            reverse('posts:group_list', kwargs={'slug': f'{self.group.slug}'}):
+            reverse('posts:group_list', kwargs={'slug': self.group.slug}):
             'posts/group_list.html',
-            reverse('posts:profile', kwargs={'username': f'{self.user}'}):
+            reverse('posts:profile', kwargs={'username': self.user}):
             'posts/profile.html',
             reverse('posts:post_detail', kwargs={'post_id': self.post.id}):
             'posts/post_detail.html',
@@ -70,21 +68,21 @@ class ViewsURLTests(TestCase):
         """Шаблон index сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
         first_object = response.context['page_obj'][1]
-        posts_author = first_object.author
+        posts_author = first_object.author.username
         post_text = first_object.text
-        self.assertEqual(posts_author, ViewsURLTests.user)
+        self.assertEqual(posts_author, ViewsURLTests.user.username)
         self.assertEqual(post_text, ViewsURLTests.post.text)
 
     def test_group_posts_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:group_list', kwargs={'slug': f'{self.group.slug}'}))
+            reverse('posts:group_list', kwargs={'slug': self.group.slug}))
         self.assertEqual(response.context.get('group').slug, self.group.slug)
 
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:profile', kwargs={'username': f'{self.user}'}))
+            reverse('posts:profile', kwargs={'username': self.user}))
         first_object = response.context['page_obj'][1]
         posts_author = first_object.author
         self.assertEqual(posts_author, ViewsURLTests.user)
@@ -93,7 +91,7 @@ class ViewsURLTests(TestCase):
         """Шаблон post_detail сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id':
-                                                 f'{self.post.id}'}))
+                                                 self.post.id}))
         self.assertEqual(response.context.get(
             'post').author, ViewsURLTests.user)
         self.assertEqual(response.context.get(
@@ -119,9 +117,9 @@ class ViewsURLTests(TestCase):
         templates_names = (
             reverse('posts:index'),
             reverse('posts:group_list',
-                    kwargs={'slug': f'{self.new_post.group.slug}'}),
+                    kwargs={'slug': self.new_post.group.slug}),
             reverse('posts:profile',
-                    kwargs={'username': f'{self.user}'})
+                    kwargs={'username': self.user})
         )
         for reverse_name in templates_names:
             with self.subTest(reverse_name=reverse_name):
@@ -138,7 +136,6 @@ class ViewsURLTests(TestCase):
 
 class PaginatorViewsTest(TestCase):
     def setUp(self):
-        self.guest_client = Client()
         self.user = User.objects.create_user(username='auth')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
@@ -160,8 +157,8 @@ class PaginatorViewsTest(TestCase):
         """Количество постов на первой странице равно 10."""
         templates_names = (
             reverse('posts:index'),
-            reverse('posts:group_list', kwargs={'slug': f'{self.group.slug}'}),
-            reverse('posts:profile', kwargs={'username': f'{self.user}'})
+            reverse('posts:group_list', kwargs={'slug': self.group.slug}),
+            reverse('posts:profile', kwargs={'username': self.user})
         )
         for reverse_name in templates_names:
             with self.subTest(reverse_name=reverse_name):
@@ -174,8 +171,8 @@ class PaginatorViewsTest(TestCase):
         """Количество постов на первой странице равно 3."""
         templates_names = (
             reverse('posts:index'),
-            reverse('posts:group_list', kwargs={'slug': f'{self.group.slug}'}),
-            reverse('posts:profile', kwargs={'username': f'{self.user}'})
+            reverse('posts:group_list', kwargs={'slug': self.group.slug}),
+            reverse('posts:profile', kwargs={'username': self.user})
         )
         for reverse_name in templates_names:
             with self.subTest(reverse_name=reverse_name):
