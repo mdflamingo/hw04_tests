@@ -15,18 +15,6 @@ class ViewsURLTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='HasNoName')
-        cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='test_slug',
-            description='Тестовое описание',
-        )
-
-        cls.post = Post.objects.create(
-            author=cls.user,
-            text='Тестовый пост',
-            group=cls.group
-        )
-
         cls.new_group = Group.objects.create(
             title='Новая группа',
             slug='slug_slug',
@@ -37,6 +25,18 @@ class ViewsURLTests(TestCase):
             author=cls.user,
             text='Новый пост',
             group=cls.new_group
+        )
+
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test_slug',
+            description='Тестовое описание',
+        )
+
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовый пост',
+            group=cls.group
         )
 
     def setUp(self):
@@ -67,9 +67,10 @@ class ViewsURLTests(TestCase):
     def test_home_page_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
-        first_object = response.context['page_obj'][1]
+        first_object = response.context['page_obj'][0]
         posts_author = first_object.author.username
         post_text = first_object.text
+        self.assertEqual(first_object.id, ViewsURLTests.post.id)
         self.assertEqual(posts_author, ViewsURLTests.user.username)
         self.assertEqual(post_text, ViewsURLTests.post.text)
 
@@ -83,7 +84,7 @@ class ViewsURLTests(TestCase):
         """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:profile', kwargs={'username': self.user}))
-        first_object = response.context['page_obj'][1]
+        first_object = response.context['page_obj'][0]
         posts_author = first_object.author
         self.assertEqual(posts_author, ViewsURLTests.user)
 

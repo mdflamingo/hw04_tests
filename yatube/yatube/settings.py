@@ -135,6 +135,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 POSTS_NUM = 10
 
+FIRST_CHARSCTERS = 15
+
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'posts:index'
 # LOGOUT_REDIRECT_URL = 'posts:index'
