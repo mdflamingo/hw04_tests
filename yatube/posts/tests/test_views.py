@@ -68,25 +68,26 @@ class ViewsURLTests(TestCase):
         """Шаблон index сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
         first_object = response.context['page_obj'][0]
-        posts_author = first_object.author.username
-        post_text = first_object.text
         self.assertEqual(first_object.id, ViewsURLTests.post.id)
-        self.assertEqual(posts_author, ViewsURLTests.user.username)
-        self.assertEqual(post_text, ViewsURLTests.post.text)
+        self.assertEqual(first_object.author_id, ViewsURLTests.user.id)
+        self.assertEqual(first_object.author, ViewsURLTests.user)
+        self.assertEqual(first_object.text, ViewsURLTests.post.text)
 
     def test_group_posts_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:group_list', kwargs={'slug': self.group.slug}))
         self.assertEqual(response.context.get('group').slug, self.group.slug)
+        self.assertEqual(response.context.get(
+            'group').id, ViewsURLTests.group.id)
 
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:profile', kwargs={'username': self.user}))
         first_object = response.context['page_obj'][0]
-        posts_author = first_object.author
-        self.assertEqual(posts_author, ViewsURLTests.user)
+        self.assertEqual(first_object.author_id, ViewsURLTests.user.id)
+        self.assertEqual(first_object.author, ViewsURLTests.user)
 
     def test_post_detail_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
@@ -94,9 +95,15 @@ class ViewsURLTests(TestCase):
             reverse('posts:post_detail', kwargs={'post_id':
                                                  self.post.id}))
         self.assertEqual(response.context.get(
-            'post').author, ViewsURLTests.user)
+            'post').id, ViewsURLTests.post.id)
         self.assertEqual(response.context.get(
             'post').text, ViewsURLTests.post.text)
+        self.assertEqual(response.context.get(
+            'post').author_id, ViewsURLTests.user.id)
+        self.assertEqual(response.context.get(
+            'post').author, ViewsURLTests.user)
+        self.assertEqual(response.context.get(
+            'post').group_id, ViewsURLTests.group.id)
         self.assertEqual(response.context.get(
             'post').group, ViewsURLTests.post.group)
 

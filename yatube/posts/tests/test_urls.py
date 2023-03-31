@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -36,17 +38,17 @@ class PostURLTests(TestCase):
         for address in url_names:
             with self.subTest(address=address):
                 response = self.client.get(address)
-                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_url_unexisting_page(self):
         """Страница //unexisting_page/ не существует."""
         response = self.client.get('/unexisting_page/')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_post_list_url_exists_at_desired_location_authorized(self):
         """Страница /create/ доступна авторизованному пользователю."""
         response = self.authorized_client.get(reverse('posts:post_create'))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_list_url_redirect_anonymous_on_admin_login(self):
         """Страница по адресу /create/ перенаправит анонимного
@@ -69,7 +71,7 @@ class PostURLTests(TestCase):
         """Страница /posts/post_id/edit/ доступна автору."""
         response = self.authorized_client.get(
             reverse('posts:post_edit', kwargs={'post_id': self.post.id}))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
